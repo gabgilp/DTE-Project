@@ -13,12 +13,12 @@ print("Connection Successful!")
 
 # plant_id and source_key (only in the weather sensor files) are redundant, so we drop them
 plant1_generation = pd.read_csv("data/Plant_1_Generation_Data.csv", 
-                                parse_dates=["DATE_TIME"], dayfirst=True).drop(columns=["PLANT_ID"])
+                                parse_dates=["DATE_TIME"], dayfirst=True)
 plant1_weather = pd.read_csv("data/Plant_1_Weather_Sensor_Data.csv", 
                                 parse_dates=["DATE_TIME"]).drop(columns=["PLANT_ID","SOURCE_KEY"])
 
 plant2_generation = pd.read_csv("data/Plant_2_Generation_Data.csv", 
-                                parse_dates=["DATE_TIME"]).drop(columns=["PLANT_ID"])
+                                parse_dates=["DATE_TIME"])
 plant2_weather = pd.read_csv("data/Plant_2_Weather_Sensor_Data.csv", 
                                 parse_dates=["DATE_TIME"]).drop(columns=["PLANT_ID","SOURCE_KEY"])
 
@@ -37,7 +37,19 @@ plant2["SOURCE_KEY"] = plant2["SOURCE_KEY"].map(panel_num_mapping_2)
 plant1 = plant1.set_index("DATE_TIME")
 plant2 = plant2.set_index("DATE_TIME")
 
-# write the dataframes back to csv files, if needed as backup (?)
+# replace plant ids with 1 and 2
+plant1["PLANT_ID"] = 1
+plant2["PLANT_ID"] = 2
+
+# merge plants vertically and sort by index (DATE_TIME) to preserve chronological order
+both_plants = pd.concat([plant1, plant2], axis=0)
+both_plants.sort_index(inplace=True)
+both_plants.to_csv("data/both_plants.csv")
+
+plant1 = plant1.drop(columns=["PLANT_ID"])
+plant2 = plant2.drop(columns=["PLANT_ID"])
+
+# write the separate dataframes back to csv files, if needed as backup (?)
 plant1.to_csv("data/plant1_final.csv")
 plant2.to_csv("data/plant2_final.csv")
 
