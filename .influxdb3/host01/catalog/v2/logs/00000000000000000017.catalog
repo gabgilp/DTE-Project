@@ -1,0 +1,1 @@
+idb3.004.l_› q{"catalog_batch":{"Node":{"time_ns":1759869981100783000,"node_catalog_id":0,"node_id":"host01","ops":[{"StopNode":{"node_id":"host01","stopped_time_ns":1759869981100783000,"process_uuid":"5671032a-fadf-40b7-9090-4837e0535c29"}}]}},"sequence_number":17}
