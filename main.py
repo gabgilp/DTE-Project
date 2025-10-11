@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request
-import pandas as pd
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from influxdb_client_3 import InfluxDBClient3
 
 # Initialize InfluxDB client 
@@ -23,6 +23,21 @@ from routers.utils import router as utils_router
 from routers.predict import router as predict_router
 
 app = FastAPI()
+
+# Add CORS middleware to allow frontend access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "http://127.0.0.1:5173",  # Alternative localhost
+        "http://localhost:3000",  # Common React port
+        "http://127.0.0.1:3000",  # Alternative
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+
 app.include_router(replay_router)
 app.include_router(utils_router)
 app.include_router(predict_router)

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Solar Plant Visualization</title>
+    <style>
+      body { margin: 0; overflow: hidden; background: white; font-family: sans-serif; }
+      
+      #controls {
+        position: absolute; top: 15px; left: 15px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 30px; border-radius: 14px;
+        box-shadow: 0 5px 18px rgba(0,0,0,0.15);
+        min-width: 336px;
+        font-size: 19px;
+      }
+      
+      #controls h3 {
+        margin: 0 0 24px 0;
+        color: #333;
+        font-size: 24px;
+      }
+      
+      #controls div {
+        margin-bottom: 18px;
+      }
+      
+      #controls label {
+        display: inline-block;
+        width: 96px;
+        font-weight: bold;
+        color: #555;
+        font-size: 19px;
+      }
+      
+      #controls select {
+        width: 192px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 7px;
+        font-size: 18px;
+      }
+      
+      #controls input[type="date"], #controls input[type="time"] {
+        width: 150px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 7px;
+        font-size: 18px;
+        margin-right: 10px;
+      }
+      
+      #jumpToTimeBtn {
+        padding: 10px 16px;
+        background: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      
+      #jumpToTimeBtn:hover {
+        background: #1976D2;
+      }
+      
+      #jumpToTimeBtn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+      
+      #playPauseBtn, #restartBtn, #stopBtn {
+        padding: 14px 24px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 19px;
+        font-weight: bold;
+        margin-right: 12px;
+      }
+      
+      #playPauseBtn:hover {
+        background: #45a049;
+      }
+      
+      #playPauseBtn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+      
+      #restartBtn {
+        background: #ff9800;
+      }
+      
+      #restartBtn:hover {
+        background: #e68900;
+      }
+      
+      #restartBtn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+      
+      #stopBtn {
+        background: #f44336;
+      }
+      
+      #stopBtn:hover {
+        background: #d32f2f;
+      }
+      
+      #stopBtn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+      
+      #statusMessage {
+        margin-top: 15px;
+        color: #e74c3c;
+        font-size: 17px;
+        font-weight: bold;
+      }
+      
+      #statusMessage:empty {
+        margin-top: 0;
+      }
+      
+      #hud {
+        position: absolute; top: 15px; right: 15px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 38px; border-radius: 18px;
+        font-family: sans-serif;
+        font-size: 24px;
+        box-shadow: 0 6px 23px rgba(0,0,0,0.15);
+        min-width: 300px;
+      }
+      
+      #hud b {
+        font-size: 24px;
+        color: #333;
+      }
+      
+      #hud span {
+        font-size: 27px;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Control Panel -->
+    <div id="controls">
+      <h3>Solar Inverter Simulation</h3>
+      <div>
+        <label for="plantSelect">Plant:</label>
+        <select id="plantSelect">
+          <option value="">Select Plant</option>
+          <option value="Plant1">Plant 1</option>
+          <option value="Plant2">Plant 2</option>
+        </select>
+      </div>
+      <div>
+        <label for="inverterSelect">Inverter:</label>
+        <select id="inverterSelect">
+          <option value="">Select Inverter</option>
+          <option value="1">Inverter 1</option>
+          <option value="2">Inverter 2</option>
+          <option value="3">Inverter 3</option>
+          <option value="4">Inverter 4</option>
+          <option value="5">Inverter 5</option>
+          <option value="6">Inverter 6</option>
+          <option value="7">Inverter 7</option>
+          <option value="8">Inverter 8</option>
+          <option value="9">Inverter 9</option>
+          <option value="10">Inverter 10</option>
+          <option value="11">Inverter 11</option>
+          <option value="12">Inverter 12</option>
+          <option value="13">Inverter 13</option>
+          <option value="14">Inverter 14</option>
+          <option value="15">Inverter 15</option>
+          <option value="16">Inverter 16</option>
+          <option value="17">Inverter 17</option>
+          <option value="18">Inverter 18</option>
+          <option value="19">Inverter 19</option>
+          <option value="20">Inverter 20</option>
+          <option value="21">Inverter 21</option>
+          <option value="22">Inverter 22</option>
+        </select>
+      </div>
+      <div>
+        <label for="speedControl">Speed:</label>
+        <select id="speedControl">
+          <option value="1">1x (Normal)</option>
+          <option value="2">2x (Fast)</option>
+          <option value="5">5x (Faster)</option>
+          <option value="10">10x (Very Fast)</option>
+          <option value="20">20x (Maximum)</option>
+        </select>
+      </div>
+      <div>
+        <label for="dateInput">Date:</label>
+        <input type="date" id="dateInput" min="2020-05-15" max="2020-06-17" value="2020-05-15">
+      </div>
+      <div>
+        <label for="timeInput">Time:</label>
+        <input type="time" id="timeInput" step="900" min="00:00" max="23:45" value="00:00">
+        <button id="jumpToTimeBtn">Jump to Time</button>
+      </div>
+      <div>
+        <button id="playPauseBtn">▶️ Play</button>
+        <button id="restartBtn">🔄 Restart</button>
+        <button id="stopBtn">⏹️ Stop</button>
+      </div>
+      <div id="statusMessage"></div>
+    </div>
+
+    <!-- Data HUD -->
+    <div id="hud">
+      <b>Timestamp:</b> <span id="timestamp">-</span><br/>
+      <b>AC Power:</b> <span id="power">-</span> kW<br/>
+      <b>Module Temp:</b> <span id="module">-</span> °C<br/>
+      <b>Ambient Temp:</b> <span id="ambient">-</span> °C<br/>
+      <b>Irradiation:</b> <span id="irradiation">-</span>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
