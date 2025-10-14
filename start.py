@@ -200,8 +200,10 @@ def check_data_files():
         "data/Plant_1_Weather_Sensor_Data.csv",
         "data/Plant_2_Generation_Data.csv",
         "data/Plant_2_Weather_Sensor_Data.csv",
-        "Plant1_inverter_Model_V2.keras",
-        "Plant2_inverter_Model.keras"
+        "ML/Plant1_inverter_Model_V2.keras",
+        "ML/Plant2_inverter_Model.keras",
+        "ML/prediction_timestamps_plant_1.json",
+        "ML/prediction_timestamps_plant_2.json"
     ]
     
     missing_files = []

@@ -159,8 +159,8 @@ def load_all_models():
     
     # Define only the inverter models we need
     model_files = [
-        "Plant1_inverter_Model_V2.keras",  # Use V2 for Plant 1
-        "Plant2_inverter_Model.keras"
+        "ML/Plant1_inverter_Model_V2.keras",  # Use V2 for Plant 1
+        "ML/Plant2_inverter_Model.keras"
     ]
     
     for model_file in model_files:
@@ -188,7 +188,7 @@ def get_prediction_timestamps(plant: str = Query(..., description="Plant number 
         raise HTTPException(status_code=400, detail="Plant must be 1 or 2")
     
     # Load the appropriate timestamp file
-    timestamp_file = f"prediction_timestamps_plant_{plant}.json"
+    timestamp_file = f"ML/prediction_timestamps_plant_{plant}.json"
     
     if not os.path.exists(timestamp_file):
         raise HTTPException(status_code=404, detail=f"Timestamp file not found for plant {plant}")
@@ -244,7 +244,7 @@ def generate_prediction(plant: str = Query(..., description="Plant number (1 or 
         raise HTTPException(status_code=400, detail="Invalid timestamp format. Use ISO format like '2020-06-17T23:45:00'")
     
     # Load the appropriate timestamp file to validate the timestamp
-    timestamp_file = f"prediction_timestamps_plant_{plant}.json"
+    timestamp_file = f"ML/prediction_timestamps_plant_{plant}.json"
     
     if not os.path.exists(timestamp_file):
         raise HTTPException(status_code=404, detail=f"Timestamp file not found for plant {plant}")
@@ -270,7 +270,7 @@ def generate_prediction(plant: str = Query(..., description="Plant number (1 or 
             )
         
         # Determine the correct model file
-        model_file = f"Plant{plant}_inverter_Model_V2.keras" if plant == "1" else f"Plant{plant}_inverter_Model.keras"
+        model_file = f"ML/Plant{plant}_inverter_Model_V2.keras" if plant == "1" else f"ML/Plant{plant}_inverter_Model.keras"
         
         # Check if model is loaded
         if model_file not in loaded_models:

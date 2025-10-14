@@ -96,7 +96,7 @@ def compute_prediction_timestamps_compact(plant_num, sequence_length=24):
 def save_compact_database(compact_db, plant_num):
     """Save the compact prediction database"""
     
-    filename = f"prediction_timestamps_plant_{plant_num}.json"
+    filename = f"ML/prediction_timestamps_plant_{plant_num}.json"
     
     print("💾 Saving compact database...")
     with open(filename, 'w') as f:
