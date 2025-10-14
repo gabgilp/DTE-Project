@@ -747,9 +747,9 @@ async function jumpToDateTime() {
   const hours = parseInt(selectedHour);
   const minutes = parseInt(selectedMinute);
   
-  // Create new timestamp in UTC (month is 0-indexed in JavaScript Date)
-  // The input is already in UTC format since our data is in UTC
-  const targetTimestamp = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+  // Create new timestamp in local time (month is 0-indexed in JavaScript Date)
+  // Use local time to match the prediction timestamps format
+  const targetTimestamp = new Date(year, month - 1, day, hours, minutes, 0);
   
   if (currentMode === 'prediction') {
     // Handle prediction mode jump
@@ -763,12 +763,8 @@ async function jumpToDateTime() {
     let minDiff = Infinity;
     
     for (let i = 0; i < predictionTimestamps.length; i++) {
-      // Ensure the prediction timestamp is treated as UTC by adding 'Z' if it doesn't have it
-      let timestampString = predictionTimestamps[i];
-      if (!timestampString.endsWith('Z') && !timestampString.includes('+')) {
-        timestampString += 'Z'; // Treat as UTC
-      }
-      const predTimestamp = new Date(timestampString);
+      // Use local time interpretation for consistent comparison
+      const predTimestamp = new Date(predictionTimestamps[i]);
       const diff = Math.abs(predTimestamp.getTime() - targetTimestamp.getTime());
       if (diff < minDiff) {
         minDiff = diff;
@@ -1038,12 +1034,8 @@ function updatePredictionUI() {
   if (predictionTimestamps.length === 0) return;
   
   const currentTimestamp = predictionTimestamps[currentPredictionIndex];
-  // Ensure proper UTC handling for display
-  let timestampString = currentTimestamp;
-  if (!timestampString.endsWith('Z') && !timestampString.includes('+')) {
-    timestampString += 'Z';
-  }
-  const timestamp = new Date(timestampString);
+  // Use local time interpretation (same as actual timestamp)
+  const timestamp = new Date(currentTimestamp);
   
   // Update the prediction counter and timestamp display
   document.getElementById('predictionCounter').textContent = 
@@ -1139,6 +1131,7 @@ async function generatePrediction() {
       document.getElementById('actualModule').textContent = actualData.MODULE_TEMPERATURE.toFixed(2);
       document.getElementById('actualAmbient').textContent = actualData.AMBIENT_TEMPERATURE.toFixed(2);
       document.getElementById('actualIrradiation').textContent = actualData.IRRADIATION.toFixed(2);
+      // Use local time interpretation (same as predicted timestamp should be)
       document.getElementById('actualTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
     } else {
       // No actual data available
@@ -1146,6 +1139,7 @@ async function generatePrediction() {
       document.getElementById('actualModule').textContent = 'N/A';
       document.getElementById('actualAmbient').textContent = 'N/A';
       document.getElementById('actualIrradiation').textContent = 'N/A';
+      // Use local time interpretation (same as predicted timestamp should be)
       document.getElementById('actualTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
     }
     
@@ -1164,13 +1158,9 @@ async function generatePrediction() {
     }
     
     // Update prediction counter and timestamp - this was already set by updatePredictionUI, but refresh it
-    let displayTimestampString = currentTimestamp;
-    if (!displayTimestampString.endsWith('Z') && !displayTimestampString.includes('+')) {
-      displayTimestampString += 'Z';
-    }
     document.getElementById('predictionCounter').textContent = 
       `${currentPredictionIndex + 1} / ${predictionTimestamps.length}`;
-    document.getElementById('predictedTimestamp').textContent = new Date(displayTimestampString).toLocaleString();
+    document.getElementById('predictedTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
     
     // Update panel colors based on power
     if (actualData) {
@@ -1253,6 +1243,7 @@ async function loadActualDataForPrediction(timestamp) {
       document.getElementById('actualModule').textContent = actualData.MODULE_TEMPERATURE.toFixed(2);
       document.getElementById('actualAmbient').textContent = actualData.AMBIENT_TEMPERATURE.toFixed(2);
       document.getElementById('actualIrradiation').textContent = actualData.IRRADIATION.toFixed(2);
+      // Use local time interpretation (consistent with predicted timestamp)
       document.getElementById('actualTimestamp').textContent = new Date(timestamp).toLocaleString();
       
       // Update actual panel color
@@ -1285,6 +1276,7 @@ async function loadActualDataForPrediction(timestamp) {
     document.getElementById('actualModule').textContent = 'Error';
     document.getElementById('actualAmbient').textContent = 'Error';
     document.getElementById('actualIrradiation').textContent = 'Error';
+    // Use local time interpretation (consistent with predicted timestamp)
     document.getElementById('actualTimestamp').textContent = new Date(timestamp).toLocaleString();
     
     // Reset panel colors to blue on error
