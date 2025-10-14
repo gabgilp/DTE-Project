@@ -391,7 +391,7 @@ def open_browser(url):
         if platform.system() == 'Darwin':  # macOS
             subprocess.run(["open", url], check=True)
         elif platform.system() == 'Windows':
-            subprocess.run(["start", url], shell=True, check=True)
+            os.startfile(url)  # Windows-specific method
         else:  # Linux
             subprocess.run(["xdg-open", url], check=True)
         print_success(f"Opened {url} in browser")
