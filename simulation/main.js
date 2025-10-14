@@ -491,9 +491,18 @@ function selectMode(mode) {
   // Update the UI based on the selected mode
   updateUIForMode(mode);
   
-  // Show welcome message
-  const modeDisplayName = mode === 'replay' ? 'Replay' : 'Prediction';
-  showStatusMessage(`${modeDisplayName} Mode activated! Select plant and inverter to begin.`, true);
+  // If switching to prediction mode and both plant and inverter are already selected, load timestamps automatically
+  if (mode === 'prediction' && selectedPlant && selectedInverter) {
+    const plantNumber = selectedPlant === 'Plant1' ? '1' : '2';
+    fetchPredictionTimestamps(plantNumber, selectedInverter).catch(error => {
+      console.error('Failed to auto-load prediction timestamps:', error);
+    });
+    showStatusMessage(`${mode === 'replay' ? 'Replay' : 'Prediction'} Mode activated! Loading timestamps...`, true);
+  } else {
+    // Show welcome message
+    const modeDisplayName = mode === 'replay' ? 'Replay' : 'Prediction';
+    showStatusMessage(`${modeDisplayName} Mode activated! Select plant and inverter to begin.`, true);
+  }
 }
 
 function updateUIForMode(mode) {
@@ -747,9 +756,9 @@ async function jumpToDateTime() {
   const hours = parseInt(selectedHour);
   const minutes = parseInt(selectedMinute);
   
-  // Create new timestamp in local time (month is 0-indexed in JavaScript Date)
-  // Use local time to match the prediction timestamps format
-  const targetTimestamp = new Date(year, month - 1, day, hours, minutes, 0);
+  // Create timestamp string in UTC format with 'Z' suffix to force UTC interpretation
+  const timestampString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`;
+  const targetTimestamp = new Date(timestampString);
   
   if (currentMode === 'prediction') {
     // Handle prediction mode jump
@@ -763,8 +772,12 @@ async function jumpToDateTime() {
     let minDiff = Infinity;
     
     for (let i = 0; i < predictionTimestamps.length; i++) {
-      // Use local time interpretation for consistent comparison
-      const predTimestamp = new Date(predictionTimestamps[i]);
+      // Force UTC interpretation by adding 'Z' if not present
+      let timestampStr = predictionTimestamps[i];
+      if (!timestampStr.endsWith('Z') && !timestampStr.includes('+')) {
+        timestampStr += 'Z';
+      }
+      const predTimestamp = new Date(timestampStr);
       const diff = Math.abs(predTimestamp.getTime() - targetTimestamp.getTime());
       if (diff < minDiff) {
         minDiff = diff;
@@ -791,6 +804,9 @@ async function jumpToDateTime() {
   } else {
     // Handle replay mode jump (existing logic)
     currentTimestamp = targetTimestamp;
+    
+    // Mark as no longer first start since we're jumping to a specific timestamp
+    isFirstStart = false;
     
     // Reset the panel to blue and clear data initially
     cellSurface.material.color = new THREE.Color(0x0066ff); // Blue
@@ -916,6 +932,15 @@ async function fetchData() {
       document.getElementById('ambient').textContent = '-';
       document.getElementById('irradiation').textContent = '-';
       
+      // Check if we've reached the final timestamp before incrementing
+      const finalTimestamp = new Date(Date.UTC(2020, 5, 17, 23, 45, 0)); // June 17, 2020 23:45:00 UTC
+      if (currentTimestamp.getTime() >= finalTimestamp.getTime()) {
+        // Reached the end of the dataset
+        pauseSimulation();
+        showStatusMessage('⏹️ Reached end of dataset (June 17, 2020 23:45:00 UTC)', true);
+        return;
+      }
+      
       // Increment timestamp by 15 minutes for next fetch (even when no data)
       currentTimestamp.setUTCMinutes(currentTimestamp.getUTCMinutes() + 15);
       
@@ -941,6 +966,15 @@ async function fetchData() {
       document.getElementById('module').textContent = '-';
       document.getElementById('ambient').textContent = '-';
       document.getElementById('irradiation').textContent = '-';
+      
+      // Check if we've reached the final timestamp before incrementing
+      const finalTimestamp = new Date(Date.UTC(2020, 5, 17, 23, 45, 0)); // June 17, 2020 23:45:00 UTC
+      if (currentTimestamp.getTime() >= finalTimestamp.getTime()) {
+        // Reached the end of the dataset
+        pauseSimulation();
+        showStatusMessage('⏹️ Reached end of dataset (June 17, 2020 23:45:00 UTC)', true);
+        return;
+      }
       
       // Increment timestamp by 15 minutes for next fetch (even when no data)
       currentTimestamp.setUTCMinutes(currentTimestamp.getUTCMinutes() + 15);
@@ -968,6 +1002,15 @@ async function fetchData() {
     // Clear any previous status message
     clearStatusMessage();
     
+    // Check if we've reached the final timestamp before incrementing
+    const finalTimestamp = new Date(Date.UTC(2020, 5, 17, 23, 45, 0)); // June 17, 2020 23:45:00 UTC
+    if (currentTimestamp.getTime() >= finalTimestamp.getTime()) {
+      // Reached the end of the dataset
+      pauseSimulation();
+      showStatusMessage('⏹️ Reached end of dataset (June 17, 2020 23:45:00 UTC)', true);
+      return;
+    }
+    
     // Increment timestamp by 15 minutes for next fetch (ONLY after successful processing)
     currentTimestamp.setUTCMinutes(currentTimestamp.getUTCMinutes() + 15);
 
@@ -993,6 +1036,15 @@ async function fetchData() {
     document.getElementById('module').textContent = '-';
     document.getElementById('ambient').textContent = '-';
     document.getElementById('irradiation').textContent = '-';
+    
+    // Check if we've reached the final timestamp before incrementing
+    const finalTimestamp = new Date(Date.UTC(2020, 5, 17, 23, 45, 0)); // June 17, 2020 23:45:00 UTC
+    if (currentTimestamp.getTime() >= finalTimestamp.getTime()) {
+      // Reached the end of the dataset
+      pauseSimulation();
+      showStatusMessage('⏹️ Reached end of dataset (June 17, 2020 23:45:00 UTC)', true);
+      return;
+    }
     
     // Increment timestamp by 15 minutes for next fetch (even on API error)
     currentTimestamp.setUTCMinutes(currentTimestamp.getUTCMinutes() + 15);
@@ -1034,8 +1086,12 @@ function updatePredictionUI() {
   if (predictionTimestamps.length === 0) return;
   
   const currentTimestamp = predictionTimestamps[currentPredictionIndex];
-  // Use local time interpretation (same as actual timestamp)
-  const timestamp = new Date(currentTimestamp);
+  // Force UTC interpretation by adding 'Z' if not present
+  let timestampStr = currentTimestamp;
+  if (!timestampStr.endsWith('Z') && !timestampStr.includes('+')) {
+    timestampStr += 'Z';
+  }
+  const timestamp = new Date(timestampStr);
   
   // Update the prediction counter and timestamp display
   document.getElementById('predictionCounter').textContent = 
@@ -1131,16 +1187,24 @@ async function generatePrediction() {
       document.getElementById('actualModule').textContent = actualData.MODULE_TEMPERATURE.toFixed(2);
       document.getElementById('actualAmbient').textContent = actualData.AMBIENT_TEMPERATURE.toFixed(2);
       document.getElementById('actualIrradiation').textContent = actualData.IRRADIATION.toFixed(2);
-      // Use local time interpretation (same as predicted timestamp should be)
-      document.getElementById('actualTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
+      // Force UTC interpretation by adding 'Z' if not present
+      let actualTimestampStr = currentTimestamp;
+      if (!actualTimestampStr.endsWith('Z') && !actualTimestampStr.includes('+')) {
+        actualTimestampStr += 'Z';
+      }
+      document.getElementById('actualTimestamp').textContent = new Date(actualTimestampStr).toLocaleString();
     } else {
       // No actual data available
       document.getElementById('actualPower').textContent = 'N/A';
       document.getElementById('actualModule').textContent = 'N/A';
       document.getElementById('actualAmbient').textContent = 'N/A';
       document.getElementById('actualIrradiation').textContent = 'N/A';
-      // Use local time interpretation (same as predicted timestamp should be)
-      document.getElementById('actualTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
+      // Force UTC interpretation by adding 'Z' if not present
+      let actualTimestampStr = currentTimestamp;
+      if (!actualTimestampStr.endsWith('Z') && !actualTimestampStr.includes('+')) {
+        actualTimestampStr += 'Z';
+      }
+      document.getElementById('actualTimestamp').textContent = new Date(actualTimestampStr).toLocaleString();
     }
     
     // Update predicted data UI - only AC_POWER changes, weather data stays same as actual
@@ -1160,7 +1224,12 @@ async function generatePrediction() {
     // Update prediction counter and timestamp - this was already set by updatePredictionUI, but refresh it
     document.getElementById('predictionCounter').textContent = 
       `${currentPredictionIndex + 1} / ${predictionTimestamps.length}`;
-    document.getElementById('predictedTimestamp').textContent = new Date(currentTimestamp).toLocaleString();
+    // Force UTC interpretation by adding 'Z' if not present
+    let predictedTimestampStr = currentTimestamp;
+    if (!predictedTimestampStr.endsWith('Z') && !predictedTimestampStr.includes('+')) {
+      predictedTimestampStr += 'Z';
+    }
+    document.getElementById('predictedTimestamp').textContent = new Date(predictedTimestampStr).toLocaleString();
     
     // Update panel colors based on power
     if (actualData) {
@@ -1243,8 +1312,12 @@ async function loadActualDataForPrediction(timestamp) {
       document.getElementById('actualModule').textContent = actualData.MODULE_TEMPERATURE.toFixed(2);
       document.getElementById('actualAmbient').textContent = actualData.AMBIENT_TEMPERATURE.toFixed(2);
       document.getElementById('actualIrradiation').textContent = actualData.IRRADIATION.toFixed(2);
-      // Use local time interpretation (consistent with predicted timestamp)
-      document.getElementById('actualTimestamp').textContent = new Date(timestamp).toLocaleString();
+      // Force UTC interpretation by adding 'Z' if not present
+      let timestampStr = timestamp;
+      if (!timestampStr.endsWith('Z') && !timestampStr.includes('+')) {
+        timestampStr += 'Z';
+      }
+      document.getElementById('actualTimestamp').textContent = new Date(timestampStr).toLocaleString();
       
       // Update actual panel color
       const actualRatio = Math.min(actualData.AC_POWER / 1000.0, 1.0);
@@ -1276,8 +1349,12 @@ async function loadActualDataForPrediction(timestamp) {
     document.getElementById('actualModule').textContent = 'Error';
     document.getElementById('actualAmbient').textContent = 'Error';
     document.getElementById('actualIrradiation').textContent = 'Error';
-    // Use local time interpretation (consistent with predicted timestamp)
-    document.getElementById('actualTimestamp').textContent = new Date(timestamp).toLocaleString();
+    // Force UTC interpretation by adding 'Z' if not present
+    let errorTimestampStr = timestamp;
+    if (!errorTimestampStr.endsWith('Z') && !errorTimestampStr.includes('+')) {
+      errorTimestampStr += 'Z';
+    }
+    document.getElementById('actualTimestamp').textContent = new Date(errorTimestampStr).toLocaleString();
     
     // Reset panel colors to blue on error
     actualPanel.cellSurface.material.color = new THREE.Color(0x0066ff);
