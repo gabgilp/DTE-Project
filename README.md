@@ -1,10 +1,10 @@
-# 🌞 Solar Power Digital Twin
+# Solar Power Digital Twin
 
 This is a **Digital Twin project** for the course *Digital Twin Engineering*. It provides a complete system for replaying historical solar power data and generating predictions using LSTM models, with an interactive 3D visualization.
 
 ---
 
-## 🚀 Easiest Way to Run (Recommended)
+## Easiest Way to Run (Recommended)
 
 **One command to start everything:**
 
@@ -13,16 +13,16 @@ python3 start.py
 ```
 
 This automatically:
-- ✅ Creates virtual environment
-- ✅ Installs all Python & Node dependencies
-- ✅ Starts database, backend, and frontend
-- ✅ Opens your browser automatically
+- Creates virtual environment
+- Installs all Python & Node dependencies
+- Starts database, backend, and frontend
+- Opens your browser automatically
 
-👉 **See [QUICKSTART.md](QUICKSTART.md) for full guide**
+**See [QUICKSTART.md](QUICKSTART.md) for full guide**
 
 ---
 
-## 📦 Manual Setup (Alternative)
+## Manual Setup (Alternative)
 
 ### 1. Create a virtual environment (optional but recommended)
 ```bash
@@ -50,7 +50,7 @@ influxdb3 serve \
 uvicorn main:app --reload
 ```
 By default, the API will run at:
-🌐 http://127.0.0.1:8000
+http://127.0.0.1:8000
 
 ### 4. Run the frontend
 ```bash
@@ -58,4 +58,4 @@ npm run dev
 ```
 
 By default, the frontend will run at:
-🌐 http://localhost:5173
+http://localhost:5173

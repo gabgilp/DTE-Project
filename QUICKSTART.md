@@ -1,4 +1,4 @@
-# 🚀 Quick Start Guide
+# Quick Start Guide
 
 ## One-Command Launcher (Recommended)
 
@@ -9,15 +9,15 @@ python3 start.py
 ```
 
 That's it! The script will automatically:
-1. ✅ Check all prerequisites (Python, Node.js, InfluxDB CLI)
-2. 📦 Create a virtual environment
-3. 🔧 Install all Python dependencies
-4. 📦 Install all frontend dependencies  
-5. 💾 Start InfluxDB database
-6. 🔄 Load data (if needed)
-7. 🚀 Start backend API
-8. 🌐 Start frontend
-9. 🌍 Open your browser to the application
+1. Check all prerequisites (Python, Node.js, InfluxDB CLI)
+2. Create a virtual environment
+3. Install all Python dependencies
+4. Install all frontend dependencies  
+5. Start InfluxDB database
+6. Load data (if needed)
+7. Start backend API
+8. Start frontend
+9. Open your browser to the application
 
 **No manual setup required!**
 
@@ -28,18 +28,18 @@ That's it! The script will automatically:
 Before running `start.py`, you need these installed:
 
 ### Required:
-- **Python 3.8+** (check: `python3 --version`)
+- **Python >=3.8 and  <3.13** (check: `python3 --version`)
 - **Node.js 16+** (check: `node --version`)
 - **npm** (check: `npm --version`)
 - **InfluxDB 3 CLI** ([Download](https://github.com/InfluxCommunity/influxdb3-python))
 
 ### The script handles automatically:
-- ✅ Creating Python virtual environment
-- ✅ Installing all Python packages (FastAPI, TensorFlow, etc.)
-- ✅ Installing all Node packages (Vite, etc.)
-- ✅ Loading database data
-- ✅ Starting all services
-- ✅ Opening browser
+- Creating Python virtual environment
+- Installing all Python packages (FastAPI, TensorFlow, etc.)
+- Installing all Node packages (Vite, etc.)
+- Loading database data
+- Starting all services
+- Opening browser
 
 ---
 
@@ -193,14 +193,14 @@ python3 start.py
 
 ## Features
 
-- ✅ **Automatic dependency installation**
-- ✅ **Sequential service startup with error checking**
-- ✅ **Colored terminal output for easy monitoring**
-- ✅ **Automatic browser launch**
-- ✅ **Graceful shutdown of all services**
-- ✅ **Virtual environment isolation**
-- ✅ **Database data loading**
-- ✅ **Process monitoring**
+- **Automatic dependency installation**
+- **Sequential service startup with error checking**
+- **Colored terminal output for easy monitoring**
+- **Automatic browser launch**
+- **Graceful shutdown of all services**
+- **Virtual environment isolation**
+- **Database data loading**
+- **Process monitoring**
 
 ---
 

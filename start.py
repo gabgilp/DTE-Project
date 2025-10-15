@@ -73,7 +73,7 @@ signal.signal(signal.SIGINT, signal_handler)
 def check_python_version():
     """Check if Python version is 3.8 or higher"""
     version = sys.version_info
-    if version.major < 3 or (version.major == 3 and version.minor < 8):
+    if version.major < 3 or (version.major == 3 and version.minor < 8) or (version.major == 3 and version.minor >= 13):
         print_error(f"Python 3.8+ required. Current version: {version.major}.{version.minor}")
         return False
     print_success(f"Python version: {version.major}.{version.minor}.{version.micro}")
